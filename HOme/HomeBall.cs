@@ -12,13 +12,14 @@ namespace HOme
 {
     public partial class HomeBall : Form
     {
-       private int verVel = 0;
-       private int horVel = 0;
-       private int speed = 2;
+        private int verVel = 0;
+        private int horVel = 0;
+        private int speed = 2;
         bool mouseDown = false;
+        private PictureBox brick = new PictureBox();
 
-       private Timer mainTimer = null;
-       private Point MouseDownLocation;
+        private Timer mainTimer = null;
+        private Point MouseDownLocation;
 
 
         public HomeBall()
@@ -39,6 +40,8 @@ namespace HOme
             Ball.Height = 100;
             Ball.Width = 100;
             Ball.BackColor = Color.Transparent;
+
+            BuildBricks(5, 10);
         }
 
         private void InitializeMainTimer()
@@ -55,13 +58,13 @@ namespace HOme
             BallBorderColusion();
             RacketColusion();
             updateVelocities();
-            
+            BallBrickCollision();
         }
 
         private void MoveTheBall()
         {
             Ball.Top += verVel;
-            Ball.Left += horVel;      
+            Ball.Left += horVel;
         }
 
         private void BallBorderColusion()
@@ -84,16 +87,16 @@ namespace HOme
             }
 
         }
-       
-        
+
+
         private void Field_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.X)
+            if (e.KeyCode == Keys.X)
             {
                 speed += 1;
                 UpdateSpeedLable();
             }
-            else if(e.KeyCode == Keys.Z)
+            else if (e.KeyCode == Keys.Z)
             {
                 if (speed > 1)
                 {
@@ -101,14 +104,14 @@ namespace HOme
                     UpdateSpeedLable();
                 }
             }
-               
+
         }
 
         private void UpdateSpeedLable()
         {
             LabS.Text = "Ball Speed: " + speed;
         }
-       
+
         private void updateVelocities()
         {
             verVel = speed * (verVel / Math.Abs(verVel));
@@ -122,7 +125,6 @@ namespace HOme
             {
                 verVel = -verVel;
             }
-
         }
 
 
@@ -140,6 +142,44 @@ namespace HOme
             {
                 racket.Left = e.X + racket.Left - MouseDownLocation.X;
                 racket.Top = e.Y + racket.Top - MouseDownLocation.Y;
+            }
+        }
+
+        private void BuildBricks(int rows, int cols)
+        {
+            int brickWidth = 60;
+            int brickheight = 20;
+            int brickVerSpace = 5;
+            int brickHorSpace = 10;
+
+            for (int r = 1; r <= rows; r++)
+            {
+                for (int c = 1; c <= cols; c++)
+                {
+                    brick = new PictureBox();
+                    brick.BackColor = Color.RosyBrown;
+                    brick.Width = brickWidth;
+                    brick.Height = brickheight;
+                    brick.Left = c * (brickWidth + brickHorSpace);
+                    brick.Top = r * (brickheight + brickVerSpace);
+                    brick.Tag = "brick";
+                    this.Controls.Add(brick);
+                }
+            }
+        }
+
+        private void BallBrickCollision()
+        {
+            foreach (Control contr in this.Controls)
+            {
+                if ((string)contr.Tag == "brick")
+                {
+                    if (contr.Bounds.IntersectsWith(Ball.Bounds))
+                    {
+                        contr.Dispose();
+                    }
+                }
+
             }
         }
     }
